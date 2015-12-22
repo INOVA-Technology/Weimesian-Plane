@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Weimisian Plane Grapher And More!</title>
+	<style>
+
+		#equation {
+			display: block;
+			width: 400px;
+		}
+
+		#controls * {
+			margin: 5px 0;
+		}
+
+	</style>
+</head>
+<body>
+
+<canvas id="plane" width="400" height="400"></canvas>
+
+<div id="controls">
+	<label for="equation">Equation to graph: (x is in radians)</label>
+	<input type="text" id="equation" value="(Math.sin(x / 2) + 1) * (Math.PI / 4)">
+	<button id="graphButton">Graph it!</button>
+</div>
+
+<script>
+	'use strict';
+
+	var canvas = document.getElementById('plane');
+	var ctx = canvas.getContext('2d');
+	var width = canvas.width;
+	var height = canvas.height;
+	var equation = document.getElementById('equation');
+	var graphButton = document.getElementById('graphButton');
+
+	// config.
+	var pointRadius = 2;
+	var amountOfPhases = 15;
+
+	var phaseWidth = width / 2 / amountOfPhases;
+	var origin = [width / 2, height / 2];
+
+	function graphEquation() {
+		ctx.clearRect(0, 0, width, height);
+		for (var x = 0; x < amountOfPhases; x++) {
+			var angle = -eval(equation.value);
+
+			ctx.beginPath()
+			ctx.arc(origin[0], origin[0], phaseWidth * x, 0, 2 * Math.PI, false);
+			ctx.strokeStyle = "darkGray";
+			ctx.strokeWidth = 1;
+			ctx.stroke();
+
+			ctx.beginPath();
+			var _x = origin[0] + x * phaseWidth;
+			var _y = origin[1];
+
+			var newX = (_x - origin[0]) * Math.cos(angle) - (_y - origin[1]) * Math.sin(angle) + origin[0];
+			var newY = (_x - origin[0]) * Math.sin(angle) + (_y - origin[1]) * Math.cos(angle) + origin[1];
+
+			ctx.arc(newX, newY, pointRadius, 0, 2 * Math.PI, false);
+			ctx.fillStyle = 'black';
+			ctx.fill();
+		}
+	}
+
+	graphEquation();
+
+	graphButton.addEventListener('click', function() {
+		graphEquation();
+	});
+
+
+</script>
+</body>
+</html>
