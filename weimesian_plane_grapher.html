@@ -4,6 +4,10 @@
 	<title>Weimesian Plane Grapher And More!</title>
 	<style>
 
+		#plane {
+			border: 1px solid black;
+		}
+
 		#equation {
 			display: block;
 			width: 400px;
@@ -68,8 +72,7 @@
 			var newY = (_x - origin[0]) * Math.sin(angle) + (_y - origin[1]) * Math.cos(angle) + origin[1];
 
 			canvasPoints.push([newX, newY]);
-			// cartesianPoints.push([...]);
-			// points.push([newX - origin[0], -(newY - origin[1])]);
+			cartesianPoints.push([(newX - origin[0]) / phaseWidth, -(newY - origin[1]) / phaseWidth]);
 
 			ctx.arc(newX, newY, pointRadius, 0, 2 * Math.PI, false);
 			ctx.fillStyle = 'black';
@@ -84,30 +87,42 @@
 	});
 
 	canvas.addEventListener('click', function(e) {
-		var mousePos = getMousePositionInCanvas(e);
-		var threshhold = 15;
+		var mousePos = getMousePositionInCartesianPlane(e);
+		var threshhold = 1;
 
 		var closestPoint = null;
 		var closestDist = -1;
 
-		for (var i = 0; i < canvasPoints.length; i++) {
-			var p = canvasPoints[i];
-			var dist = Math.sqrt(Math.pow(p[0] - e.clientX, 2) + Math.pow(p[1] - event.clientY, 2));
+		var clickPos = canvasPointToCartesianPoint(getMousePositionInCanvas(e));
+
+		for (var i = 0; i < cartesianPoints.length; i++) {
+			var p = cartesianPoints[i];
+			var dist = Math.sqrt(Math.pow(p[0] - clickPos[0], 2) + Math.pow(p[1] - clickPos[1], 2));
 			if (dist <= threshhold && (dist < closestDist || closestDist < 0)) {
 				closestDist = dist;
 				closestPoint = p;
 			}
 		}
-
-		console.log(closestPoint);
 	});
 
 	function getMousePositionInCanvas(event) {
 		var rect = canvas.getBoundingClientRect();
-		return [event.clientX - rect.left, event.clientY - rect.top]
+		return [event.clientX - rect.left, event.clientY - rect.top];
 	}
 
-	// console.log();
+	function canvasPointToCartesianPoint(point) {
+		var x =   point[0] - origin[0];
+		var y = -(point[1] - origin[1]);
+		return [x / phaseWidth, y / phaseWidth];
+	}
+
+	function getMousePositionInCartesianPlane(event) {
+		var rect = canvas.getBoundingClientRect();
+		var x =   event.clientX - rect.left - origin[0];
+		var y = -(event.clientY - rect.top  - origin[1]);
+		return [x / phaseWidth, y / phaseWidth];
+	}
+
 
 	var _points = [[0, 0], [-0.5, Math.sqrt(3)/2], [-Math.sqrt(3)/2, 0.5], [-1, 0]];
 	var results = regression('polynomial', _points, 3);
