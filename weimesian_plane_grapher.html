@@ -29,6 +29,9 @@
 	<button id="graphButton">Graph it!</button>
 </div>
 
+<p>Click on a point to see its value</p>
+<p id="point-display"></p>
+
 <script src="regression.min.js"></script>
 <script>
 	'use strict';
@@ -93,7 +96,7 @@
 		var closestPoint = null;
 		var closestDist = -1;
 
-		var clickPos = canvasPointToCartesianPoint(getMousePositionInCanvas(e));
+		var clickPos = getMousePositionInCartesianPlane(e);
 
 		for (var i = 0; i < cartesianPoints.length; i++) {
 			var p = cartesianPoints[i];
@@ -103,6 +106,9 @@
 				closestPoint = p;
 			}
 		}
+
+		// console.log(closestPoint);
+		displayPoint(closestPoint);
 	});
 
 	function getMousePositionInCanvas(event) {
@@ -117,16 +123,19 @@
 	}
 
 	function getMousePositionInCartesianPlane(event) {
-		var rect = canvas.getBoundingClientRect();
-		var x =   event.clientX - rect.left - origin[0];
-		var y = -(event.clientY - rect.top  - origin[1]);
-		return [x / phaseWidth, y / phaseWidth];
+		return canvasPointToCartesianPoint(getMousePositionInCanvas(event));
 	}
 
 
 	var _points = [[0, 0], [-0.5, Math.sqrt(3)/2], [-Math.sqrt(3)/2, 0.5], [-1, 0]];
 	var results = regression('polynomial', _points, 3);
 	// console.log(results);
+
+
+	function displayPoint(point) {
+		var idc = document.getElementById('point-display');
+		idc.textContent = "x: " + point[0] + ", y: " + point[1];
+	}
 
 </script>
 </body>
